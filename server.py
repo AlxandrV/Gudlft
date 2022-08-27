@@ -1,4 +1,5 @@
 import json
+from urllib.error import HTTPError
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
@@ -26,8 +27,13 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    try:
+        club = [club for club in clubs if club['email'] == request.form['email']][0]
+        return render_template('welcome.html',club=club,competitions=competitions)
+    except IndexError:
+        return render_template('index.html', error=True)
+    finally:
+        return page_not_found()
 
 
 @app.route('/book/<competition>/<club>')
@@ -57,3 +63,8 @@ def purchasePlaces():
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+
+@app.errorhandler(Exception)
+def page_not_found():
+    return render_template('page_404.html')
