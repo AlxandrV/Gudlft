@@ -17,7 +17,7 @@ class TestPurchasePlaces:
         points_per_place = 1            
         mocker.patch.object(server, 'clubs', clubs)
         mocker.patch.object(server, 'competitions', competitions)
-        # mocker.patch.object(server, 'points_per_place', points_per_place)
+        mocker.patch.object(server, 'points_per_place', points_per_place)
         club = clubs[0]
         club_points_after = club['points']
         competition = competitions[0]
@@ -27,11 +27,13 @@ class TestPurchasePlaces:
             'club': club['name'],
             'places': places
         }
+
         # request client and data capture returned
         response = client.post('/purchasePlaces', data=data, follow_redirects=True)
         res_data = response.data.decode('utf-8')
         assert len(captured_templates) == 1
         template, context = captured_templates[0]
+        
         # assertion check
         assert template.name == 'welcome.html'
         if data['places'] > int(club_points_after) or data['places'] > int(number_of_places_after) or data['places'] < 0:
