@@ -1,6 +1,8 @@
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
 
+from datetime import datetime
+
 
 def loadClubs():
     with open('clubs.json') as c:
@@ -27,7 +29,8 @@ def index():
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return render_template('welcome.html', club=club, competitions=competitions, current_datetime=current_datetime)
 
 
 @app.route('/book/<competition>/<club>')
