@@ -14,7 +14,7 @@ class TestPurchasePlaces:
     )
     def test_purchase_available(self, mocker, captured_templates, client, clubs, competitions, places):
         # datas mocked
-        points_per_place = 1            
+        points_per_place = 1         
         mocker.patch.object(server, 'clubs', clubs)
         mocker.patch.object(server, 'competitions', competitions)
         mocker.patch.object(server, 'points_per_place', points_per_place)
@@ -36,11 +36,11 @@ class TestPurchasePlaces:
         
         # assertion check
         assert template.name == 'welcome.html'
-        if data['places'] > int(club_points_after) or data['places'] > int(number_of_places_after) or data['places'] < 0:
+        if data['places'] * points_per_place > int(club_points_after) or data['places'] > int(number_of_places_after) or data['places'] < 0:
             # Number of places is invalid
             assert int(context['club']['points']) == int(club_points_after)
             assert int(context['competitions'][0]['numberOfPlaces']) == int(number_of_places_after)
-            if data['places'] > int(club_points_after):
+            if data['places'] * points_per_place > int(club_points_after):
                 assert 'Insufficient points!' in res_data
             elif data['places'] > int(number_of_places_after):
                 assert 'Number of places not available!' in res_data
