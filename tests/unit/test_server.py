@@ -3,7 +3,7 @@ import pytest
 
 class TestPurchasePlaces:
 
-    def test_purchase_max_places(self, mocker, client, clubs, competitions):
+    def test_purchase_more_max_places(self, mocker, client, clubs, competitions):
         max_places = 8
         mocker.patch.object(server, 'clubs', clubs)
         mocker.patch.object(server, 'competitions', competitions)
