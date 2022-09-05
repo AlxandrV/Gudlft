@@ -26,6 +26,22 @@ class TestPurchasePlaces:
     def test_points_deducted_at_purchase(self, mocker, captured_templates, client, clubs, competitions):
         mocker.patch.object(server, 'clubs', clubs)
         mocker.patch.object(server, 'competitions', competitions)
+    
+    @pytest.mark.parametrize(
+        'places',
+        [
+            (3),
+            (10),
+            (100),
+            (-10)
+        ]
+    )
+    def test_purchase_available(self, mocker, captured_templates, client, clubs, competitions, places):
+        # datas mocked
+        points_per_place = 1         
+        mocker.patch.object(server, 'clubs', clubs)
+        mocker.patch.object(server, 'competitions', competitions)
+        mocker.patch.object(server, 'points_per_place', points_per_place)
         club = clubs[0]
         club_points_after = club['points']
         competition = competitions[0]

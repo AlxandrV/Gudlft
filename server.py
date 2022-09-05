@@ -1,5 +1,4 @@
 import json
-from urllib.error import HTTPError
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
@@ -21,6 +20,8 @@ app.secret_key = 'something_special'
 competitions = loadCompetitions()
 clubs = loadClubs()
 MAX_PLACES = 12
+points_per_place = 1
+
 
 @app.route('/')
 def index():
@@ -56,10 +57,16 @@ def purchasePlaces():
     flash('Great-booking complete!')
     if placesRequired > MAX_PLACES:
         flash(f'Maximum number of places at reservation {MAX_PLACES}!')
-    else:
-        club['points'] = int(club['points']) - placesRequired
+    elif placesRequired * points_per_place >= 0 and placesRequired * points_per_place <= int(club['points']):
+        club['points'] = int(club['points']) - placesRequired * points_per_place
         competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
         flash('Great-booking complete!')
+    elif placesRequired * points_per_place > int(club['points']):
+        flash('Insufficient points!')
+    elif placesRequired > int(competition['numberOfPlaces']):
+        flash('Number of places not available!')
+    else:
+        flash('Invalid number of places!')
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
