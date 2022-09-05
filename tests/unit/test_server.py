@@ -21,6 +21,7 @@ class TestLogin:
         response = client.post('/showSummary', data=email, follow_redirects=True)
         assert response.status_code == 200
         
+
 class TestPurchasePlaces:
 
     def test_points_deducted_at_purchase(self, mocker, captured_templates, client, clubs, competitions):
@@ -80,4 +81,25 @@ class TestPurchasePlaces:
         response = client.post('/purchasePlaces', data=data, follow_redirects=True)
         res_data = response.data.decode('utf-8')
         assert f'Maximum number of places at reservation {max_places}!' in res_data
+        assert response.status_code == 200
+
+
+class TestShowCompetions:
+
+    def test_booking_competions_in_past(self, mocker, client, clubs, competitions):
+        mocker.patch.object(server, 'competitions', [competitions[1]])
+        mocker.patch.object(server, 'clubs', clubs)
+        data = {'email': clubs[0]['email']}
+        response = client.post('/showSummary', data=data, follow_redirects=True)
+        res_data = response.data.decode('utf-8')
+        assert 'Book Places' not in res_data
+        assert response.status_code == 200
+
+    def test_booking_competions_in_future(self, mocker, client, clubs, competitions):
+        mocker.patch.object(server, 'competitions', [competitions[0]])
+        mocker.patch.object(server, 'clubs', clubs)
+        data = {'email': clubs[0]['email']}
+        response = client.post('/showSummary', data=data, follow_redirects=True)
+        res_data = response.data.decode('utf-8')
+        assert 'Book Places' in res_data
         assert response.status_code == 200
