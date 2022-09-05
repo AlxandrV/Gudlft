@@ -10,6 +10,9 @@
     <form action="showSummary" method="post">
         <label for="email">Email:</label>
         <input type="email" name="email" id=""/>
+        {% if error == True %}
+        <label for="email" style="font-style: italic">Enter a valid email</label>
+        {% endif %}
         <button type="submit">Enter</button>
     </form>
 </body>
