@@ -1,6 +1,5 @@
 import server
 import pytest
-
 from flask import template_rendered
 
 
@@ -22,11 +21,13 @@ def client():
 
 @pytest.fixture
 def clubs():
-    return [{
-        "name":"Test club",
-        "email":"test_club@test.com",
-        "points":"10"
-    }]
+    return [
+        {
+            "name": "Test club",
+            "email": "test_club@test.com",
+            "points": "10"
+        }
+    ]
 
 @pytest.fixture
 def competitions():
