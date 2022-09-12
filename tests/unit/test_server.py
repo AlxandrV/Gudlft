@@ -209,3 +209,12 @@ class TestShowCompetions:
         assert f"Points invested: {competition['investedPoints'][clubs[0]['name']]['points']}" in res_data
         assert response.status_code == 200
 
+
+class Testlogout:
+
+    def test_logout(self, client, captured_templates):
+        response = client.get('/logout', follow_redirects=True)
+        assert len(captured_templates) == 1
+        template, context = captured_templates[0]
+        assert template.name == 'index.html'
+        assert response.status_code == 200
