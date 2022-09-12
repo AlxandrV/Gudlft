@@ -22,7 +22,7 @@ app.secret_key = 'something_special'
 competitions = loadCompetitions()
 clubs = loadClubs()
 MAX_PLACES = 12
-points_per_place = 1
+points_per_place = 3
 
 
 @app.route('/')
@@ -62,6 +62,24 @@ def purchasePlaces():
     elif placesRequired * points_per_place >= 0 and placesRequired * points_per_place <= int(club['points']):
         club['points'] = int(club['points']) - placesRequired * points_per_place
         competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+        # print(type(competition))
+        if 'investedPoints' in competition:
+            if club['name'] in competition['investedPoints']:
+                print('ici')
+                competition['investedPoints'][club['name']]['places'] += placesRequired
+                competition['investedPoints'][club['name']]['points'] += placesRequired * points_per_place
+            else:
+                competition['investedPoints'][club['name']] = {
+                    'places': placesRequired,
+                    'points': placesRequired * points_per_place
+                }
+        else:
+            competition['investedPoints'] = {
+                club['name']: {
+                    'places': placesRequired,
+                    'points': placesRequired * points_per_place
+                }
+            }
         flash('Great-booking complete!')
     elif placesRequired * points_per_place > int(club['points']):
         flash('Insufficient points!')
