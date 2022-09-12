@@ -218,3 +218,35 @@ class Testlogout:
         template, context = captured_templates[0]
         assert template.name == 'index.html'
         assert response.status_code == 200
+
+
+class TestBooking:
+
+    def test_booking_should_200(self, mocker, captured_templates, client, clubs, competitions):
+        mocker.patch.object(server, 'clubs', clubs)
+        mocker.patch.object(server, 'competitions', competitions)
+        response = client.get(f"/book/{competitions[0]['name']}/{clubs[0]['name']}")
+        assert len(captured_templates) == 1
+        template, context = captured_templates[0]
+        assert template.name == 'booking.html'
+        assert context['club'] == clubs[0]
+        assert context['competition'] == competitions[0]
+        assert response.status_code == 200
+
+    @pytest.mark.parametrize(
+        'booking_list',
+        [
+            (['Test competition', 'Bad club']),
+            (['Bad competition', 'Test club']),
+            (['Bad competition', 'Bad club'])
+        ]
+    )
+    def test_booking_should_error(self, mocker, captured_templates, client, clubs, competitions, booking_list):
+        mocker.patch.object(server, 'clubs', clubs)
+        mocker.patch.object(server, 'competitions', competitions)
+        response = client.get(f"/book/{booking_list[0]}/{booking_list[1]}")
+        assert len(captured_templates) == 1
+        template, context = captured_templates[0]
+        assert template.name == 'page_404.html'
+        assert response.status_code == 200
+
