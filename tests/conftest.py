@@ -26,7 +26,13 @@ def clubs():
             "name": "Test club",
             "email": "test_club@test.com",
             "points": "10"
+        },
+        {
+            "name": "Test other club",
+            "email": "test_club@test.com",
+            "points": "100"
         }
+
     ]
 
 @pytest.fixture

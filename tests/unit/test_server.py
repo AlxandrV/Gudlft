@@ -250,3 +250,18 @@ class TestBooking:
         assert template.name == 'page_404.html'
         assert response.status_code == 200
 
+
+class TestPublicBoard:
+
+    def test_public_board_should_200(self, mocker, captured_templates, client, clubs):
+        mocker.patch.object(server, 'clubs', clubs)
+        response = client.get('/board')
+        res_data = response.data.decode('utf-8')
+        assert len(captured_templates) == 1
+        template, context = captured_templates[0]
+        assert context['clubs'] == clubs
+        assert template.name == 'board.html'
+        for club in clubs:
+            assert club['name'] in res_data
+            assert club['points'] in res_data
+        assert response.status_code == 200
