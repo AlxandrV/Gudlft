@@ -37,9 +37,20 @@ def competitions():
             "date": "2022-12-10 08:55:23",
             "numberOfPlaces": "20"
         },
-                {
+        {
             "name": "Test competition in past",
             "date": "2020-12-10 08:55:23",
             "numberOfPlaces": "10"
+        },
+        {
+            "name": "Test competition",
+            "date": "2023-12-10 08:55:23",
+            "numberOfPlaces": "20",
+            "investedPoints": {
+                "Test club": {
+                    "places": 1,
+                    "points": 2
+                }
+            }
         }
     ]

@@ -62,10 +62,8 @@ def purchasePlaces():
     elif placesRequired * points_per_place >= 0 and placesRequired * points_per_place <= int(club['points']):
         club['points'] = int(club['points']) - placesRequired * points_per_place
         competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-        # print(type(competition))
         if 'investedPoints' in competition:
             if club['name'] in competition['investedPoints']:
-                print('ici')
                 competition['investedPoints'][club['name']]['places'] += placesRequired
                 competition['investedPoints'][club['name']]['points'] += placesRequired * points_per_place
             else:

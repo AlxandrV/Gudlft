@@ -111,3 +111,101 @@ class TestShowCompetions:
         res_data = response.data.decode('utf-8')
         assert 'Book Places' in res_data
         assert response.status_code == 200
+
+    @pytest.mark.parametrize(
+        'competitions_param',
+        (
+            ([{
+                "name": "Test competition",
+                "date": "2023-12-10 08:55:23",
+                "numberOfPlaces": "20"
+            }]),
+            ([{
+                "name": "Test competition",
+                "date": "2023-12-10 08:55:23",
+                "numberOfPlaces": "20",
+                "investedPoints": {
+                    "Test club": {
+                        "places": 1,
+                        "points": 2
+                    }
+                }
+            }])
+        )
+    )
+    def test_login_show_places_purchased(self, mocker, captured_templates, client, clubs, competitions_param):
+        # datas mocked
+        mocker.patch.object(server, 'competitions', competitions_param)
+        mocker.patch.object(server, 'clubs', clubs)
+        competition = competitions_param[0]
+        data = {'email': clubs[0]['email']}
+
+        # request client and data capture returned
+        response = client.post('/showSummary', data=data, follow_redirects=True)
+        res_data = response.data.decode('utf-8')
+        assert len(captured_templates) == 1
+        template, context = captured_templates[0]
+        
+        # assertion check
+        assert template.name == 'welcome.html'
+        res_data = response.data.decode('utf-8')
+        if 'investedPoints' in context['competitions'][0]:
+            assert context['competitions'][0]['investedPoints'][clubs[0]['name']]['places'] == competition['investedPoints'][clubs[0]['name']]['places']
+            assert context['competitions'][0]['investedPoints'][clubs[0]['name']]['points'] == competition['investedPoints'][clubs[0]['name']]['points']
+            assert f"You have: {competition['investedPoints'][clubs[0]['name']]['places']} places" in res_data
+            assert f"Points invested: {competition['investedPoints'][clubs[0]['name']]['points']}" in res_data
+        else:
+            assert f"You have:" not in res_data
+            assert f"Points invested:" not in res_data
+
+        assert response.status_code == 200
+
+    @pytest.mark.parametrize(
+        'competitions_param',
+        (
+            ([{
+                "name": "Test competition",
+                "date": "2023-12-10 08:55:23",
+                "numberOfPlaces": "20"
+            }]),
+            ([{
+                "name": "Test competition",
+                "date": "2023-12-10 08:55:23",
+                "numberOfPlaces": "20",
+                "investedPoints": {
+                    "Test club": {
+                        "places": 1,
+                        "points": 2
+                    }
+                }
+            }])
+        )
+    )
+    def test_update_show_places_to_purchase(self, mocker, captured_templates, client, clubs, competitions_param):
+        # datas mocked
+        points_per_place = 1         
+        mocker.patch.object(server, 'clubs', clubs)
+        mocker.patch.object(server, 'competitions', competitions_param)
+        mocker.patch.object(server, 'points_per_place', points_per_place)
+        club = clubs[0]
+        competition = competitions_param[0]
+        data = {
+            'competition': competition['name'],
+            'club': club['name'],
+            'places': 1
+        }
+
+        # request client and data capture returned
+        response = client.post('/purchasePlaces', data=data, follow_redirects=True)
+        res_data = response.data.decode('utf-8')
+        assert len(captured_templates) == 1
+        template, context = captured_templates[0]
+        
+        # assertion check
+        assert template.name == 'welcome.html'
+        assert context['competitions'][0]['investedPoints'][clubs[0]['name']]['places'] == competition['investedPoints'][clubs[0]['name']]['places']
+        assert context['competitions'][0]['investedPoints'][clubs[0]['name']]['points'] == competition['investedPoints'][clubs[0]['name']]['points']
+        assert f"You have: {competition['investedPoints'][clubs[0]['name']]['places']} places" in res_data
+        assert f"Points invested: {competition['investedPoints'][clubs[0]['name']]['points']}" in res_data
+        assert response.status_code == 200
+
