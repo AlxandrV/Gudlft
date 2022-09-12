@@ -24,16 +24,12 @@ class TestLogin:
 
 class TestPurchasePlaces:
 
-    def test_points_deducted_at_purchase(self, mocker, captured_templates, client, clubs, competitions):
-        mocker.patch.object(server, 'clubs', clubs)
-        mocker.patch.object(server, 'competitions', competitions)
-    
     @pytest.mark.parametrize(
         'places',
         [
             (3),
             (10),
-            (100),
+            (11),
             (-10)
         ]
     )
@@ -50,7 +46,7 @@ class TestPurchasePlaces:
         data = {
             'competition': competition['name'],
             'club': club['name'],
-            'places': int(club['points'])-1
+            'places': places
         }
 
         # request client and data capture returned
@@ -58,12 +54,24 @@ class TestPurchasePlaces:
         res_data = response.data.decode('utf-8')
         assert len(captured_templates) == 1
         template, context = captured_templates[0]
-
+        
         # assertion check
         assert template.name == 'welcome.html'
-        assert int(context['club']['points']) == int(club_points_after) - int(data['places'])
-        assert int(context['competitions'][0]['numberOfPlaces']) == int(number_of_places_after) - int(data['places'])
-        assert 'Great-booking complete!' in res_data
+        if data['places'] * points_per_place > int(club_points_after) or data['places'] > int(number_of_places_after) or data['places'] < 0:
+            # Number of places is invalid
+            assert int(context['club']['points']) == int(club_points_after)
+            assert int(context['competitions'][0]['numberOfPlaces']) == int(number_of_places_after)
+            if data['places'] * points_per_place > int(club_points_after):
+                assert 'Insufficient points!' in res_data
+            elif data['places'] > int(number_of_places_after):
+                assert 'Number of places not available!' in res_data
+            else:
+                assert 'Invalid number of places!' in res_data
+        else:
+            # Points and places available
+            assert int(context['club']['points']) == int(club_points_after) - int(data['places']) * int(points_per_place)
+            assert int(context['competitions'][0]['numberOfPlaces']) == int(number_of_places_after) - int(data['places'])
+            assert 'Great-booking complete!' in res_data
         assert response.status_code == 200
 
     def test_purchase_more_max_places(self, mocker, client, clubs, competitions):

@@ -31,19 +31,14 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-<<<<<<< HEAD
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
-        return render_template('welcome.html',club=club,competitions=competitions)
+        current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return render_template('welcome.html', club=club, competitions=competitions, current_datetime=current_datetime)
     except IndexError:
         return render_template('index.html', error=True)
-    finally:
+    except Exception as e:
         return page_not_found()
-=======
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    return render_template('welcome.html', club=club, competitions=competitions, current_datetime=current_datetime)
->>>>>>> bug/booking_to_past_competitions
 
 
 @app.route('/book/<competition>/<club>')
@@ -62,7 +57,6 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
-    flash('Great-booking complete!')
     if placesRequired > MAX_PLACES:
         flash(f'Maximum number of places at reservation {MAX_PLACES}!')
     elif placesRequired * points_per_place >= 0 and placesRequired * points_per_place <= int(club['points']):
@@ -75,7 +69,8 @@ def purchasePlaces():
         flash('Number of places not available!')
     else:
         flash('Invalid number of places!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return render_template('welcome.html', club=club, competitions=competitions, current_datetime=current_datetime)
 
 
 # TODO: Add route for points display
