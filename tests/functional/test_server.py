@@ -15,7 +15,6 @@ class TestFunctional:
         competitions = server.loadCompetitions()
         clubs = server.loadClubs()
         competition = [competition for competition in competitions if competition['name'] == 'Test competitions'][0]
-        # print(competition)
         places_before = competition['numberOfPlaces']
         club = [club for club in clubs if club['email'] == 'admin@test.com'][0]
         points_before = club['points']
@@ -37,6 +36,7 @@ class TestFunctional:
         self.browser.find_element(By.XPATH, "//input[@type='number']").send_keys(places)
         time.sleep(1)
         self.browser.find_element(By.XPATH, "//button[@type='submit']").click()
+        time.sleep(2)
 
         # Assert
         points_after = int(points_before) - places * points_per_places
